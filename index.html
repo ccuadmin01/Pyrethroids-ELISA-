@@ -2,8 +2,8 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quantitative Pyrethroid ELISA | LOQ Interpretation</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Quantitative Pyrethroid ELISA | Mobile Ready</title>
     <style>
         :root {
             --primary: #064e3b;
@@ -30,7 +30,8 @@
             align-items: flex-start;
             min-height: 100vh;
             margin: 0;
-            padding: 20px;
+            padding: 20px 10px; /* Reduced side padding for mobile */
+            box-sizing: border-box;
         }
 
         .calculator-card {
@@ -42,10 +43,11 @@
             max-width: 1000px;
             border-top: 6px solid var(--secondary);
             margin-bottom: 2rem;
+            box-sizing: border-box;
         }
 
         .header { text-align: center; margin-bottom: 2rem; }
-        .header h1 { margin: 0; font-size: 1.85rem; color: var(--primary); }
+        .header h1 { margin: 0; font-size: 1.85rem; color: var(--primary); line-height: 1.2;}
         .header p { margin: 0.5rem 0 0; font-size: 0.95rem; color: var(--text-muted); }
 
         .section-title {
@@ -54,22 +56,44 @@
             padding-bottom: 0.5rem; margin: 1.5rem 0 1rem; font-weight: 600;
         }
 
-        .grid-inputs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
-        .grid-settings { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem; }
+        /* Fluid Grids for responsive layout */
+        .grid-inputs { 
+            display: grid; 
+            grid-template-columns: repeat(5, 1fr); 
+            gap: 1rem; 
+        }
+        .grid-settings { 
+            display: grid; 
+            grid-template-columns: 1fr 2fr; 
+            gap: 1rem; 
+            margin-bottom: 1rem; 
+            align-items: center;
+        }
         
         .input-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; }
         .input-group input {
-            width: 100%; padding: 0.6rem; border: 1px solid var(--border);
-            border-radius: 6px; font-size: 0.95rem; box-sizing: border-box;
+            width: 100%; padding: 0.75rem; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 1rem; box-sizing: border-box;
+            -webkit-appearance: none; /* Better mobile rendering */
         }
         .input-group input:focus { outline: none; border-color: var(--secondary); }
         
         .highlight-input input { border: 2px solid var(--secondary); background-color: var(--bg-color); font-weight: bold; }
 
-        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        /* Responsive Table Wrapper */
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        table { width: 100%; border-collapse: collapse; min-width: 700px; /* Forces scroll on small screens */ }
         th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
-        th { background-color: var(--remark-bg); font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
-        td input { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box; }
+        th { background-color: var(--remark-bg); font-weight: 600; font-size: 0.9rem; color: var(--text-muted); white-space: nowrap; }
+        td input { width: 100%; padding: 0.6rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box; font-size: 1rem;}
         
         .cell-result { font-family: monospace; font-weight: bold; font-size: 0.95rem; }
         .status-high { color: var(--warning); }
@@ -77,15 +101,17 @@
         .status-neutral { color: #f59e0b; }
 
         button {
-            padding: 0.75rem 1.5rem; background-color: var(--secondary); color: white;
+            width: 100%; /* Default to full width for touch targets */
+            padding: 1rem; background-color: var(--secondary); color: white;
             border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
+            transition: background-color 0.2s ease; margin-bottom: 0.5rem;
+            touch-action: manipulation;
         }
         button:hover { background-color: var(--secondary-hover); }
-        .btn-add { background-color: var(--remark-bg); color: var(--primary); border: 1px dashed var(--border); width: 100%; margin-bottom: 2rem;}
-        .btn-remove { background-color: transparent; color: var(--warning); padding: 0.5rem; font-size: 1.2rem; cursor: pointer; }
-        .btn-run { width: 100%; padding: 1rem; font-size: 1.1rem; }
+        .btn-add { background-color: var(--remark-bg); color: var(--primary); border: 1px dashed var(--border); margin-bottom: 1.5rem;}
+        .btn-remove { background-color: transparent; color: var(--warning); padding: 0.5rem; font-size: 1.2rem; cursor: pointer; border: none; margin: 0;}
         
-        .btn-export { background-color: var(--primary); margin-top: 1rem; width: 100%; display: none; }
+        .btn-export { background-color: var(--primary); margin-top: 1rem; display: none; }
         .btn-export:hover { background-color: #022c22; }
 
         .validation-banner {
@@ -97,6 +123,24 @@
 
         .report-header { display: none; }
         .report-summary-box { display: none; }
+
+        /* --- MOBILE MEDIA QUERIES --- */
+        @media screen and (max-width: 768px) {
+            .calculator-card { padding: 1.5rem; }
+            .grid-inputs { grid-template-columns: repeat(2, 1fr); }
+            /* Make the last standard input span full width on tablets so it isn't orphaned */
+            .grid-inputs .input-group:last-child { grid-column: span 2; } 
+            
+            .grid-settings { grid-template-columns: 1fr; gap: 0.5rem; align-items: flex-start;}
+            .grid-settings p { padding-top: 0.5rem !important; }
+        }
+
+        @media screen and (max-width: 480px) {
+            .calculator-card { padding: 1.25rem 1rem; border-radius: 12px; }
+            .header h1 { font-size: 1.5rem; }
+            .grid-inputs { grid-template-columns: 1fr; }
+            .grid-inputs .input-group:last-child { grid-column: span 1; }
+        }
 
         /* --- PRINT SETTINGS FOR REPORT EXPORT --- */
         @media print {
@@ -118,7 +162,8 @@
                 padding: 0 !important; font-family: inherit; font-size: 1rem; color: black;
             }
             
-            table { border: 1px solid #000; }
+            .table-responsive { border: none; overflow: visible; }
+            table { border: 1px solid #000; min-width: 100%; }
             th { border-bottom: 2px solid #000; background-color: #f0f0f0 !important; color: black; -webkit-print-color-adjust: exact; }
             td { border-bottom: 1px solid #ccc; }
             
@@ -137,8 +182,8 @@
 
     <div class="calculator-card">
         <div class="header">
-            <h1>Quantitative Pyrethroid ELISA</h1>
-            <p>Logit-Log Standard Curve & LOQ Interpretation</p>
+            <h1>Pyrethroid ELISA</h1>
+            <p>Quantitative Logit-Log & LOQ (Mobile Ready)</p>
         </div>
 
         <div class="report-header">
@@ -152,12 +197,12 @@
             <div class="section-title">Assay Parameters</div>
             <div class="grid-settings">
                 <div class="input-group highlight-input">
-                    <label>Limit of Quantification (LOQ) in ppm</label>
-                    <input type="number" id="loqThreshold" step="any" value="0.01" required>
+                    <label>Limit of Quant. (LOQ) ppm</label>
+                    <input type="number" id="loqThreshold" step="any" value="0.005" required>
                 </div>
                 <div class="input-group">
                     <p style="margin:0; padding-top:1.2rem; font-size:0.85rem; color:var(--text-muted);">
-                        <em>Concentrations below this threshold will be reported as &lt; LOQ.</em>
+                        <em>Values below this limit report as &lt; LOQ.</em>
                     </p>
                 </div>
             </div>
@@ -165,24 +210,24 @@
             <div class="section-title">Standard Curve (Calibration)</div>
             <div class="grid-inputs">
                 <div class="input-group">
-                    <label>Zero (0 ppm) OD</label>
-                    <input type="number" id="std0" step="any" placeholder="e.g., 1.850" required>
+                    <label>Zero (0 ppm)</label>
+                    <input type="number" id="std0" step="any" placeholder="1.850" required>
                 </div>
                 <div class="input-group">
-                    <label>Std 1 (0.001 ppm)</label>
-                    <input type="number" id="std1" step="any" placeholder="e.g., 1.550" required>
+                    <label>Std 1 (0.001)</label>
+                    <input type="number" id="std1" step="any" placeholder="1.550" required>
                 </div>
                 <div class="input-group">
-                    <label>Std 2 (0.0025 ppm)</label>
-                    <input type="number" id="std2" step="any" placeholder="e.g., 1.200" required>
+                    <label>Std 2 (0.0025)</label>
+                    <input type="number" id="std2" step="any" placeholder="1.200" required>
                 </div>
                 <div class="input-group">
-                    <label>Std 3 (0.0075 ppm)</label>
-                    <input type="number" id="std3" step="any" placeholder="e.g., 0.700" required>
+                    <label>Std 3 (0.0075)</label>
+                    <input type="number" id="std3" step="any" placeholder="0.700" required>
                 </div>
                 <div class="input-group">
-                    <label>Std 4 (0.02 ppm)</label>
-                    <input type="number" id="std4" step="any" placeholder="e.g., 0.350" required>
+                    <label>Std 4 (0.02)</label>
+                    <input type="number" id="std4" step="any" placeholder="0.350" required>
                 </div>
             </div>
 
@@ -191,31 +236,34 @@
                 <span id="validationDetails" style="font-size: 0.85rem; font-weight: normal;"></span>
             </div>
 
-            <div class="section-title">Sample Analysis & Interpretation</div>
-            <table id="sampleTable">
-                <thead>
-                    <tr>
-                        <th style="width: 20%;">Sample ID</th>
-                        <th style="width: 15%;">OD₄₅₀</th>
-                        <th style="width: 15%;">B/B₀ (%)</th>
-                        <th style="width: 20%;">Conc. (ppm)</th>
-                        <th style="width: 25%;">Interpretation</th>
-                        <th style="width: 5%;" class="no-print"></th>
-                    </tr>
-                </thead>
-                <tbody id="sampleBody">
-                    <tr class="sample-row">
-                        <td><input type="text" class="sample-id" value="PYR-001" required></td>
-                        <td><input type="number" step="any" class="sample-od" placeholder="0.000" required></td>
-                        <td class="cell-result res-binding">-</td>
-                        <td class="cell-result res-conc">-</td>
-                        <td class="cell-result res-interp">-</td>
-                        <td class="no-print" style="text-align: center;">
-                            <button type="button" class="btn-remove" onclick="removeRow(this)">✕</button>
-                        </td>
-                    </tr>
-                </tbody>
-            </table>
+            <div class="section-title">Sample Analysis</div>
+            
+            <div class="table-responsive">
+                <table id="sampleTable">
+                    <thead>
+                        <tr>
+                            <th style="width: 25%;">Sample ID</th>
+                            <th style="width: 20%;">OD₄₅₀</th>
+                            <th style="width: 15%;">B/B₀ (%)</th>
+                            <th style="width: 15%;">ppm</th>
+                            <th style="width: 20%;">Result</th>
+                            <th style="width: 5%;" class="no-print"></th>
+                        </tr>
+                    </thead>
+                    <tbody id="sampleBody">
+                        <tr class="sample-row">
+                            <td><input type="text" class="sample-id" value="PYR-001" required></td>
+                            <td><input type="number" step="any" class="sample-od" placeholder="0.000" required></td>
+                            <td class="cell-result res-binding">-</td>
+                            <td class="cell-result res-conc">-</td>
+                            <td class="cell-result res-interp">-</td>
+                            <td class="no-print" style="text-align: center;">
+                                <button type="button" class="btn-remove" onclick="removeRow(this)">✕</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
 
             <button type="button" class="btn-add no-print" onclick="addRow()">+ Add Another Sample</button>
             <button type="submit" class="btn-run no-print">Calculate & Interpret</button>
@@ -345,7 +393,7 @@
                 if (od > b0 * 0.99) {
                     concCell.innerText = "< 0.001";
                     concCell.className = "cell-result res-conc status-low";
-                    interpCell.innerText = "< LOQ (Trace/ND)";
+                    interpCell.innerText = "< LOQ";
                     interpCell.className = "cell-result res-interp status-low";
                 } else if (od < stdODs[3] * 0.9) {
                     concCell.innerText = "> 0.02";
@@ -355,7 +403,7 @@
                         interpCell.innerText = "Quantifiable (> ULOQ)";
                         interpCell.className = "cell-result res-interp status-high";
                     } else {
-                        interpCell.innerText = "DILUTE & RETEST";
+                        interpCell.innerText = "RETEST";
                         interpCell.className = "cell-result res-interp status-neutral";
                     }
                 } else {
@@ -363,7 +411,7 @@
                     
                     if (conc < loq) {
                         concCell.className = "cell-result res-conc status-low";
-                        interpCell.innerText = "< LOQ (Trace/ND)";
+                        interpCell.innerText = "< LOQ";
                         interpCell.className = "cell-result res-interp status-low";
                     } else {
                         concCell.className = "cell-result res-conc status-high";
