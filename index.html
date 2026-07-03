@@ -3,30 +3,31 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ELISA Assayer | QC Validation</title>
+    <title>Quantitative Pyrethroid ELISA | LOQ Interpretation</title>
     <style>
         :root {
-            --primary: #0f172a;
-            --secondary: #3b82f6;
-            --secondary-hover: #2563eb;
-            --bg-color: #f8fafc;
+            --primary: #064e3b;
+            --secondary: #059669;
+            --secondary-hover: #047857;
+            --bg-color: #ecfdf5;
             --card-bg: #ffffff;
-            --text-main: #0f172a;
-            --text-muted: #64748b;
+            --text-main: #064e3b;
+            --text-muted: #475569;
             --border: #cbd5e1;
-            --success: #059669;
-            --success-bg: #d1fae5;
+            --success: #16a34a;
+            --success-bg: #dcfce7;
             --warning: #dc2626;
             --warning-bg: #fee2e2;
+            --remark-bg: #f8fafc;
         }
 
         body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
             background-color: var(--bg-color);
             color: var(--text-main);
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -36,322 +37,349 @@
             background-color: var(--card-bg);
             padding: 2.5rem;
             border-radius: 16px;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(4, 120, 87, 0.15);
             width: 100%;
-            max-width: 550px;
+            max-width: 1000px;
+            border-top: 6px solid var(--secondary);
+            margin-bottom: 2rem;
         }
 
-        .header {
-            text-align: center;
-            margin-bottom: 1.5rem;
-        }
-
-        .header h1 {
-            margin: 0;
-            font-size: 1.75rem;
-            color: var(--primary);
-        }
-
-        .header p {
-            margin: 0.5rem 0 0;
-            font-size: 0.95rem;
-            color: var(--text-muted);
-        }
+        .header { text-align: center; margin-bottom: 2rem; }
+        .header h1 { margin: 0; font-size: 1.85rem; color: var(--primary); }
+        .header p { margin: 0.5rem 0 0; font-size: 0.95rem; color: var(--text-muted); }
 
         .section-title {
-            font-size: 1rem;
-            color: var(--secondary);
+            font-size: 1.1rem; color: var(--secondary);
             border-bottom: 2px solid var(--border);
-            padding-bottom: 0.5rem;
-            margin-bottom: 1rem;
-            margin-top: 1.5rem;
-            font-weight: 600;
+            padding-bottom: 0.5rem; margin: 1.5rem 0 1rem; font-weight: 600;
         }
 
-        .grid-inputs {
-            display: grid;
-            grid-template-columns: 1fr 1fr;
-            gap: 1rem;
-        }
-
-        .input-group {
-            margin-bottom: 1rem;
-        }
-
-        .input-group.full-width {
-            grid-column: span 2;
-        }
-
-        .input-group label {
-            display: block;
-            font-weight: 500;
-            margin-bottom: 0.5rem;
-            font-size: 0.9rem;
-        }
-
+        .grid-inputs { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; }
+        .grid-settings { display: grid; grid-template-columns: 1fr 2fr; gap: 1rem; margin-bottom: 1rem; }
+        
+        .input-group label { display: block; font-weight: 600; margin-bottom: 0.5rem; font-size: 0.85rem; }
         .input-group input {
-            width: 100%;
-            padding: 0.75rem;
-            border: 1px solid var(--border);
-            border-radius: 6px;
-            font-size: 1rem;
-            transition: all 0.2s ease;
-            box-sizing: border-box;
-            background-color: #f8fafc;
+            width: 100%; padding: 0.6rem; border: 1px solid var(--border);
+            border-radius: 6px; font-size: 0.95rem; box-sizing: border-box;
         }
+        .input-group input:focus { outline: none; border-color: var(--secondary); }
+        
+        .highlight-input input { border: 2px solid var(--secondary); background-color: var(--bg-color); font-weight: bold; }
 
-        .input-group input:focus {
-            outline: none;
-            border-color: var(--secondary);
-            box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-            background-color: #ffffff;
-        }
-
-        button {
-            width: 100%;
-            padding: 1rem;
-            background-color: var(--secondary);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-            margin-top: 1rem;
-        }
-
-        button:hover {
-            background-color: var(--secondary-hover);
-        }
-
-        .error-message {
-            display: none;
-            background-color: var(--warning-bg);
-            color: var(--warning);
-            padding: 1rem;
-            border-radius: 8px;
-            margin-top: 1rem;
-            font-size: 0.9rem;
-            font-weight: 600;
-            text-align: center;
-            border: 1px solid #fecaca;
-        }
-
-        .results {
-            margin-top: 2rem;
-            display: none;
-        }
-
-        .validation-banner {
-            padding: 1rem;
-            border-radius: 8px;
-            margin-bottom: 1.5rem;
-            font-weight: 600;
-            text-align: center;
-        }
-
-        .banner-valid {
-            background-color: var(--success-bg);
-            color: var(--success);
-            border: 1px solid #a7f3d0;
-        }
-
-        .banner-invalid {
-            background-color: var(--warning-bg);
-            color: var(--warning);
-            border: 1px solid #fecaca;
-        }
-
-        .error-details {
-            font-size: 0.85rem;
-            font-weight: normal;
-            margin-top: 0.5rem;
-            display: block;
-        }
-
-        .result-box {
-            background-color: var(--bg-color);
-            padding: 1.5rem;
-            border-radius: 8px;
-            border: 1px solid var(--border);
-        }
-
-        .result-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 0.75rem;
-            font-size: 1rem;
-        }
-
-        .result-item:last-child {
-            margin-bottom: 0;
-            padding-top: 1rem;
-            border-top: 1px solid var(--border);
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
-        .value {
-            font-family: monospace;
-            font-weight: bold;
-            font-size: 1.1rem;
-        }
-
+        table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        th, td { padding: 0.75rem; text-align: left; border-bottom: 1px solid var(--border); }
+        th { background-color: var(--remark-bg); font-weight: 600; font-size: 0.9rem; color: var(--text-muted); }
+        td input { width: 100%; padding: 0.5rem; border: 1px solid var(--border); border-radius: 4px; box-sizing: border-box; }
+        
+        .cell-result { font-family: monospace; font-weight: bold; font-size: 0.95rem; }
         .status-high { color: var(--warning); }
         .status-low { color: var(--success); }
+        .status-neutral { color: #f59e0b; }
+
+        button {
+            padding: 0.75rem 1.5rem; background-color: var(--secondary); color: white;
+            border: none; border-radius: 8px; font-size: 1rem; font-weight: bold; cursor: pointer;
+        }
+        button:hover { background-color: var(--secondary-hover); }
+        .btn-add { background-color: var(--remark-bg); color: var(--primary); border: 1px dashed var(--border); width: 100%; margin-bottom: 2rem;}
+        .btn-remove { background-color: transparent; color: var(--warning); padding: 0.5rem; font-size: 1.2rem; cursor: pointer; }
+        .btn-run { width: 100%; padding: 1rem; font-size: 1.1rem; }
+        
+        .btn-export { background-color: var(--primary); margin-top: 1rem; width: 100%; display: none; }
+        .btn-export:hover { background-color: #022c22; }
+
+        .validation-banner {
+            display: none; padding: 1rem; border-radius: 8px; margin-bottom: 1.5rem;
+            font-weight: 600; text-align: center;
+        }
+        .banner-valid { background-color: var(--success-bg); color: var(--success); border: 1px solid #bbf7d0; }
+        .banner-invalid { background-color: var(--warning-bg); color: var(--warning); border: 1px solid #fecaca; }
+
+        .report-header { display: none; }
+        .report-summary-box { display: none; }
+
+        /* --- PRINT SETTINGS FOR REPORT EXPORT --- */
+        @media print {
+            @page { margin: 15mm; }
+            body { background-color: white; padding: 0; color: black; }
+            .calculator-card { box-shadow: none; border: none; padding: 0; max-width: 100%; margin: 0; }
+            
+            .no-print, button, .header, .validation-banner { display: none !important; }
+            
+            .report-header {
+                display: block; text-align: center; margin-bottom: 2rem;
+                padding-bottom: 1rem; border-bottom: 2px solid #000;
+            }
+            .report-header h2 { margin: 0 0 0.5rem 0; font-size: 1.5rem; color: black; }
+            .report-header p { margin: 0 0 0.25rem 0; color: #333; font-size: 0.95rem; }
+            
+            td input, .grid-inputs input, .grid-settings input { 
+                border: none !important; background: transparent !important; 
+                padding: 0 !important; font-family: inherit; font-size: 1rem; color: black;
+            }
+            
+            table { border: 1px solid #000; }
+            th { border-bottom: 2px solid #000; background-color: #f0f0f0 !important; color: black; -webkit-print-color-adjust: exact; }
+            td { border-bottom: 1px solid #ccc; }
+            
+            .report-summary-box {
+                display: block; margin-top: 2rem; padding: 1.5rem;
+                border: 1px solid #000; background-color: #f9f9f9 !important;
+                -webkit-print-color-adjust: exact; page-break-inside: avoid;
+            }
+            
+            .report-summary-box h3 { margin-top: 0; font-size: 1.1rem; border-bottom: 1px solid #ccc; padding-bottom: 0.5rem; }
+            .summary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; font-size: 0.95rem; }
+        }
     </style>
 </head>
 <body>
 
     <div class="calculator-card">
         <div class="header">
-            <h1>ELISA Assay Calculator</h1>
-            <p>Pesticide Analysis with QC Validation</p>
+            <h1>Quantitative Pyrethroid ELISA</h1>
+            <p>Logit-Log Standard Curve & LOQ Interpretation</p>
+        </div>
+
+        <div class="report-header">
+            <h2>Analytical Laboratory Report</h2>
+            <p><strong>Assay:</strong> Synthetic Pyrethroids (Quantitative Logit-Log ELISA)</p>
+            <p id="reportDateStr"></p>
         </div>
 
         <form id="elisaForm">
-            <div class="section-title">Calibration & Controls</div>
+            
+            <div class="section-title">Assay Parameters</div>
+            <div class="grid-settings">
+                <div class="input-group highlight-input">
+                    <label>Limit of Quantification (LOQ) in ppm</label>
+                    <input type="number" id="loqThreshold" step="any" value="0.005" required>
+                </div>
+                <div class="input-group">
+                    <p style="margin:0; padding-top:1.2rem; font-size:0.85rem; color:var(--text-muted);">
+                        <em>Concentrations below this threshold will be reported as &lt; LOQ.</em>
+                    </p>
+                </div>
+            </div>
+
+            <div class="section-title">Standard Curve (Calibration)</div>
             <div class="grid-inputs">
-                <div class="input-group full-width">
-                    <label for="b0">Zero Standard (B₀) OD₄₅₀</label>
-                    <input type="number" id="b0" step="any" placeholder="e.g., 1.850" required>
+                <div class="input-group">
+                    <label>Zero (0 ppm) OD</label>
+                    <input type="number" id="std0" step="any" placeholder="e.g., 1.850" required>
                 </div>
                 <div class="input-group">
-                    <label for="negCtrl">Negative Control OD</label>
-                    <input type="number" id="negCtrl" step="any" placeholder="e.g., 1.790" required>
+                    <label>Std 1 (0.001 ppm)</label>
+                    <input type="number" id="std1" step="any" placeholder="e.g., 1.550" required>
                 </div>
                 <div class="input-group">
-                    <label for="posCtrl">Positive Control OD</label>
-                    <input type="number" id="posCtrl" step="any" placeholder="e.g., 0.850" required>
+                    <label>Std 2 (0.0025 ppm)</label>
+                    <input type="number" id="std2" step="any" placeholder="e.g., 1.200" required>
+                </div>
+                <div class="input-group">
+                    <label>Std 3 (0.0075 ppm)</label>
+                    <input type="number" id="std3" step="any" placeholder="e.g., 0.700" required>
+                </div>
+                <div class="input-group">
+                    <label>Std 4 (0.02 ppm)</label>
+                    <input type="number" id="std4" step="any" placeholder="e.g., 0.350" required>
                 </div>
             </div>
 
-            <div class="section-title">Sample Data</div>
-            <div class="input-group full-width">
-                <label for="sample">Sample OD₄₅₀</label>
-                <input type="number" id="sample" step="any" placeholder="e.g., 0.450" required>
+            <div id="validationBanner" class="validation-banner mt-3">
+                <span id="validationStatus"></span><br>
+                <span id="validationDetails" style="font-size: 0.85rem; font-weight: normal;"></span>
             </div>
 
-            <button type="submit">Run Assay Analysis</button>
+            <div class="section-title">Sample Analysis & Interpretation</div>
+            <table id="sampleTable">
+                <thead>
+                    <tr>
+                        <th style="width: 20%;">Sample ID</th>
+                        <th style="width: 15%;">OD₄₅₀</th>
+                        <th style="width: 15%;">B/B₀ (%)</th>
+                        <th style="width: 20%;">Conc. (ppm)</th>
+                        <th style="width: 25%;">Interpretation</th>
+                        <th style="width: 5%;" class="no-print"></th>
+                    </tr>
+                </thead>
+                <tbody id="sampleBody">
+                    <tr class="sample-row">
+                        <td><input type="text" class="sample-id" value="PYR-001" required></td>
+                        <td><input type="number" step="any" class="sample-od" placeholder="0.000" required></td>
+                        <td class="cell-result res-binding">-</td>
+                        <td class="cell-result res-conc">-</td>
+                        <td class="cell-result res-interp">-</td>
+                        <td class="no-print" style="text-align: center;">
+                            <button type="button" class="btn-remove" onclick="removeRow(this)">✕</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+
+            <button type="button" class="btn-add no-print" onclick="addRow()">+ Add Another Sample</button>
+            <button type="submit" class="btn-run no-print">Calculate & Interpret</button>
         </form>
 
-        <div id="uiError" class="error-message"></div>
-
-        <div class="results" id="resultsPanel">
-            <div id="validationBanner" class="validation-banner banner-valid">
-                <span id="validationStatus">Assay Valid</span>
-                <span id="validationDetails" class="error-details">Controls are within acceptable parameters.</span>
-            </div>
-
-            <div class="result-box">
-                <div class="result-item">
-                    <span>Relative Binding (B/B₀):</span>
-                    <span class="value" id="bindingResult">0.00%</span>
-                </div>
-                <div class="result-item">
-                    <span>Sample Inhibition:</span>
-                    <span class="value" id="inhibitionResult">0.00%</span>
-                </div>
-                <div class="result-item">
-                    <span>Assessment:</span>
-                    <span class="value" id="assessmentResult">-</span>
-                </div>
+        <div id="reportSummary" class="report-summary-box">
+            <h3>Calibration & Run Summary</h3>
+            <div class="summary-grid">
+                <div><strong>Limit of Quantification (LOQ):</strong> <span id="repLOQ">-</span> ppm</div>
+                <div><strong>Total Samples Analyzed:</strong> <span id="repTotalSamples">-</span></div>
+                <div><strong>Regression Model:</strong> Logit-Log</div>
+                <div><strong>Run Status:</strong> <span id="repStatus">-</span></div>
+                <div><strong>Curve Linearity (R²):</strong> <span id="repR2">-</span></div>
+                <div><strong>Curve Slope (m):</strong> <span id="repSlope">-</span></div>
             </div>
         </div>
+
+        <button type="button" id="exportBtn" class="btn-export no-print" onclick="window.print()">🖨️ Export / Save Report as PDF</button>
+
     </div>
 
     <script>
-        // Helper function to calculate Inhibition
-        function calculateInhibition(od, b0) {
-            const binding = (od / b0) * 100;
-            return 100 - binding;
+        let sampleCounter = 1;
+        const STANDARD_CONCS = [0.001, 0.0025, 0.0075, 0.02];
+
+        function addRow() {
+            sampleCounter++;
+            const autoId = `PYR-${sampleCounter.toString().padStart(3, '0')}`;
+            const tr = document.createElement('tr');
+            tr.className = 'sample-row';
+            tr.innerHTML = `
+                <td><input type="text" class="sample-id" value="${autoId}" required></td>
+                <td><input type="number" step="any" class="sample-od" placeholder="0.000" required></td>
+                <td class="cell-result res-binding">-</td>
+                <td class="cell-result res-conc">-</td>
+                <td class="cell-result res-interp">-</td>
+                <td class="no-print" style="text-align: center;"><button type="button" class="btn-remove" onclick="removeRow(this)">✕</button></td>
+            `;
+            document.getElementById('sampleBody').appendChild(tr);
         }
 
-        // Attach event listener to the form to handle submission naturally
-        document.getElementById('elisaForm').addEventListener('submit', function(event) {
-            // Prevent the page from refreshing when you click the button
-            event.preventDefault();
+        function removeRow(btn) {
+            if (document.getElementById('sampleBody').children.length > 1) btn.closest('tr').remove();
+        }
 
-            // Reset UI
-            const errorBox = document.getElementById('uiError');
-            const resultsPanel = document.getElementById('resultsPanel');
-            errorBox.style.display = 'none';
-            resultsPanel.style.display = 'none';
+        function getLogit(y) {
+            if (y >= 1) y = 0.999;
+            if (y <= 0) y = 0.001;
+            return Math.log(y / (1 - y));
+        }
 
-            // Fetch and parse Values securely
-            const b0_OD = parseFloat(document.getElementById('b0').value);
-            const neg_OD = parseFloat(document.getElementById('negCtrl').value);
-            const pos_OD = parseFloat(document.getElementById('posCtrl').value);
-            const sample_OD = parseFloat(document.getElementById('sample').value);
+        document.getElementById('elisaForm').addEventListener('submit', function(e) {
+            e.preventDefault();
 
-            // Strict Validation
-            if (isNaN(b0_OD) || isNaN(neg_OD) || isNaN(pos_OD) || isNaN(sample_OD)) {
-                errorBox.innerText = "Error: Please fill out all fields with valid numbers.";
-                errorBox.style.display = 'block';
-                return;
+            document.getElementById('reportDateStr').innerHTML = `<strong>Date Generated:</strong> ${new Date().toLocaleString()}`;
+
+            const loq = parseFloat(document.getElementById('loqThreshold').value);
+            const b0 = parseFloat(document.getElementById('std0').value);
+            const stdODs = [
+                parseFloat(document.getElementById('std1').value),
+                parseFloat(document.getElementById('std2').value),
+                parseFloat(document.getElementById('std3').value),
+                parseFloat(document.getElementById('std4').value)
+            ];
+
+            let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+            let logitPoints = [];
+
+            for (let i = 0; i < 4; i++) {
+                let relBinding = stdODs[i] / b0;
+                let logitY = getLogit(relBinding);
+                let lnX = Math.log(STANDARD_CONCS[i]);
+
+                sumX += lnX;
+                sumY += logitY;
+                sumXY += (lnX * logitY);
+                sumX2 += (lnX * lnX);
+                
+                logitPoints.push({x: lnX, y: logitY});
             }
 
-            if (b0_OD <= 0) {
-                errorBox.innerText = "Error: Zero Standard (B₀) must be greater than zero.";
-                errorBox.style.display = 'block';
-                return;
-            }
+            const n = 4;
+            const m = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+            const c = (sumY - m * sumX) / n;
 
-            // Quality Control Calculations
-            const negInhibition = calculateInhibition(neg_OD, b0_OD);
-            const posInhibition = calculateInhibition(pos_OD, b0_OD);
-            
-            let assayValid = true;
-            let errorMsg = [];
-
-            if (negInhibition > 20) {
-                assayValid = false;
-                errorMsg.push(`Neg Control Inhibition too high (${negInhibition.toFixed(1)}%).`);
+            let ssTot = 0, ssRes = 0;
+            const meanY = sumY / n;
+            for (let p of logitPoints) {
+                let predictedY = m * p.x + c;
+                ssTot += Math.pow(p.y - meanY, 2);
+                ssRes += Math.pow(p.y - predictedY, 2);
             }
-            if (posInhibition < 30) {
-                assayValid = false;
-                errorMsg.push(`Pos Control Inhibition too low (${posInhibition.toFixed(1)}%).`);
-            }
+            const rSquared = 1 - (ssRes / ssTot);
 
-            // Update Validation UI
             const banner = document.getElementById('validationBanner');
-            const statusText = document.getElementById('validationStatus');
-            const detailsText = document.getElementById('validationDetails');
-
-            if (assayValid) {
+            let statusString = "";
+            banner.style.display = 'block';
+            
+            if (rSquared >= 0.95) {
                 banner.className = "validation-banner banner-valid";
-                statusText.innerText = "✓ Assay Valid";
-                detailsText.innerText = `Pos Control Inhibition: ${posInhibition.toFixed(1)}% | Neg Control: ${negInhibition.toFixed(1)}%`;
+                statusString = "VALID (R² >= 0.95)";
+                document.getElementById('validationStatus').innerText = "✓ Excellent Curve Fit";
             } else {
                 banner.className = "validation-banner banner-invalid";
-                statusText.innerText = "⚠ Assay Invalid";
-                detailsText.innerText = errorMsg.join(" ");
+                statusString = "INVALID (Poor Linearity)";
+                document.getElementById('validationStatus').innerText = "⚠ Poor Curve Linearity (R² < 0.95)";
             }
+            document.getElementById('validationDetails').innerText = `R² = ${rSquared.toFixed(4)} | Slope = ${m.toFixed(3)}`;
 
-            // Sample Calculations
-            const relativeBinding = (sample_OD / b0_OD) * 100;
-            const sampleInhibition = 100 - relativeBinding;
+            let totalProcessed = 0;
+            document.querySelectorAll('.sample-row').forEach(row => {
+                const od = parseFloat(row.querySelector('.sample-od').value);
+                if (isNaN(od)) return;
+                totalProcessed++;
 
-            // Print Results securely
-            document.getElementById('bindingResult').innerText = relativeBinding.toFixed(2) + '%';
-            document.getElementById('inhibitionResult').innerText = sampleInhibition.toFixed(2) + '%';
+                let y = od / b0;
+                let logitY = getLogit(y);
+                
+                let lnConc = (logitY - c) / m;
+                let conc = Math.exp(lnConc);
 
-            // Sample Assessment
-            const assessmentEl = document.getElementById('assessmentResult');
-            if (sampleInhibition > 20) {
-                assessmentEl.innerText = "Positive (Elevated Toxin)";
-                assessmentEl.className = "value status-high";
-            } else if (sampleInhibition < 0) {
-                assessmentEl.innerText = "Negative (OD > B₀)";
-                assessmentEl.className = "value status-low";
-            } else {
-                assessmentEl.innerText = "Negative (Normal)";
-                assessmentEl.className = "value status-low";
-            }
+                row.querySelector('.res-binding').innerText = (y * 100).toFixed(1) + '%';
+                
+                let concCell = row.querySelector('.res-conc');
+                let interpCell = row.querySelector('.res-interp');
+                
+                if (od > b0 * 0.99) {
+                    concCell.innerText = "< 0.001";
+                    concCell.className = "cell-result res-conc status-low";
+                    interpCell.innerText = "< LOQ (Trace/ND)";
+                    interpCell.className = "cell-result res-interp status-low";
+                } else if (od < stdODs[3] * 0.9) {
+                    concCell.innerText = "> 0.02";
+                    concCell.className = "cell-result res-conc status-high";
+                    
+                    if (loq < 0.02) {
+                        interpCell.innerText = "Quantifiable (> ULOQ)";
+                        interpCell.className = "cell-result res-interp status-high";
+                    } else {
+                        interpCell.innerText = "DILUTE & RETEST";
+                        interpCell.className = "cell-result res-interp status-neutral";
+                    }
+                } else {
+                    concCell.innerText = `${conc.toFixed(4)}`;
+                    
+                    if (conc < loq) {
+                        concCell.className = "cell-result res-conc status-low";
+                        interpCell.innerText = "< LOQ (Trace/ND)";
+                        interpCell.className = "cell-result res-interp status-low";
+                    } else {
+                        concCell.className = "cell-result res-conc status-high";
+                        interpCell.innerText = "Quantifiable (>= LOQ)";
+                        interpCell.className = "cell-result res-interp status-high";
+                    }
+                }
+            });
 
-            // Show results
-            resultsPanel.style.display = 'block';
+            document.getElementById('repLOQ').innerText = loq;
+            document.getElementById('repTotalSamples').innerText = totalProcessed;
+            document.getElementById('repStatus').innerText = statusString;
+            document.getElementById('repR2').innerText = rSquared.toFixed(4);
+            document.getElementById('repSlope').innerText = m.toFixed(4);
+
+            document.getElementById('exportBtn').style.display = 'block';
         });
     </script>
 </body>
